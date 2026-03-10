@@ -205,3 +205,12 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# MacOS specific
+.DS_Store
+
+# Data and Models (Do not upload large files)
+data/
+models/*.pth
+models/*.h5
+*.mp4

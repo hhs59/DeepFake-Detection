@@ -1,0 +1,24 @@
+# --- Deep Learning Framework ---
+torch>=2.0.0
+torchvision>=0.15.0
+
+# --- Computer Vision & Media Processing ---
+opencv-python-headless  # Optimized for environments without GUI
+mediapipe               # Fast face detection and landmarking
+pillow                  # Standard image manipulation library
+
+# --- Data Science & Analysis ---
+numpy>=1.22.0
+pandas>=1.5.0
+scikit-learn            # For evaluation metrics (Precision, Recall, F1)
+
+# --- Visualization & Progress UI ---
+matplotlib              # Plotting loss and accuracy curves
+tqdm                    # Smart progress bars for video processing loops
+
+# --- Hyperparameter Tuning ---
+optuna               # Industry standard for hyperparameter optimization
+
+# --- Development Tools ---
+ipykernel               # Support for Jupyter Notebooks in VS Code
+
