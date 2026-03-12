@@ -1,38 +1,217 @@
-# DeepFake-Detection
-# Real-time Deepfake Detection using CNN and PyTorch
+# DeepFake Detection with EfficientNet
 
-## 📝 Overview
-This project aims to develop a robust and efficient Deepfake detection system using Convolutional Neural Networks (CNN). The system focuses on real-time inference and high-precision classification between authentic and manipulated facial content.
+A deep learning pipeline for detecting **deepfake videos** using face-level classification and video-level aggregation.
 
-The model is trained and validated on the **FaceForensics++** dataset, utilizing advanced facial landmarking for precise feature extraction.
+The system extracts faces from video frames, classifies them using a convolutional neural network, and aggregates frame predictions to produce a final video-level decision.
 
----
-
-## ✨ Key Features
-- **Hardware Acceleration:** Fully optimized using PyTorch's MPS (Metal Performance Shaders) for high-speed training and inference on M2 Macs.
-- **Advanced Preprocessing:** Real-time face detection and cropping using **MediaPipe**.
-- **Hyperparameter Optimization:** Automated tuning of learning rates, architectures, and optimizers using **Optuna** (Bayesian Optimization).
-- **Real-time Inference:** A dedicated module for live deepfake detection via webcam.
+This project demonstrates a **complete machine learning workflow**, including data preprocessing, training, evaluation, and inference.
 
 ---
 
-## 🛠 Tech Stack
-- **Framework:** PyTorch (Core Deep Learning)
-- **Computer Vision:** OpenCV, MediaPipe
-- **Optimization:** Optuna
-- **Development:** Python 3.13, VS Code, Git
+# Project Pipeline
+
+```mermaid
+flowchart TD
+    A[Video Input] --> B[Frame Extraction]
+    B --> C[Face Detection]
+    C --> D[Face Dataset Construction]
+    D --> E[EfficientNet Classifier]
+    E --> F[Frame-level Predictions]
+    F --> G[Video-level Aggregation]
+```
 
 ---
 
-## 📂 Project Structure
-```text
-├── data/               # (Hidden) Dataset and processed face crops
-├── models/             # Saved model weights (.pth files)
-├── notebooks/          # Exploratory Data Analysis (EDA) and prototyping
-├── src/                # Core source code
-│   ├── sampling.py     # Frame extraction and dataset balancing
-│   ├── model.py        # CNN Architecture definitions
-│   └── train.py        # Training and validation loops
-├── app.py              # Real-time webcam inference script
-├── requirements.txt    # Production dependencies
-└── README.md           # Project documentation
+# Project Structure
+
+```
+DeepFake-Detection
+│
+├── checkpoints             # saved models
+│   └── best_model.pth
+│
+├── data                    # dataset directory
+│
+├── runs                    # TensorBoard logs
+│   └── deepfake
+│
+├── scripts                 # preprocessing scripts
+│   ├── extract_frames.py
+│   ├── detect_faces.py
+│   ├── split_dataset.py
+│   └── build_frame_dataset.py
+│
+├── src                     # main source code
+│   ├── datasets
+│   │   ├── deepfake_dataset.py
+│   │   └── build_dataloader.py
+│   │
+│   ├── models
+│   │   └── deepfake_model.py
+│   │
+│   ├── training
+│   │   ├── train.py
+│   │   └── trainer.py
+│   │
+│   ├── evaluation
+│   │   └── video_predict.py
+│   │
+│   └── utils
+│       └── metrics.py
+│
+├── requirements.txt
+├── LICENSE
+└── README.md
+```
+
+---
+
+# Dataset
+
+The dataset consists of **face crops extracted from real and fake videos**.
+
+Images are organized as:
+
+```
+data/
+  train/
+    real/
+    fake/
+
+  val/
+    real/
+    fake/
+
+  test/
+    real/
+    fake/
+```
+
+Each image corresponds to a face extracted from a video frame.
+
+Dataset splitting is performed at the **video level** to prevent frame leakage between training and evaluation sets.
+
+---
+
+# Model
+
+The classifier uses **EfficientNet-B0** pretrained on ImageNet.
+
+Architecture:
+
+```
+EfficientNet-B0 (pretrained)
+        ↓
+Dropout (0.3)
+        ↓
+Linear Layer (2 classes)
+```
+
+The model predicts whether a face image is **real or fake**.
+
+---
+
+# Data Augmentation
+
+Training images are augmented with:
+
+* Random cropping
+* Horizontal flipping
+* Color jitter
+* Gaussian blur
+
+Validation and test sets use deterministic transforms (resize + center crop).
+
+---
+
+# Training
+
+Run training with:
+
+```
+python -m src.training.train
+```
+
+Training uses:
+
+* CrossEntropyLoss
+* Adam optimizer
+* mini-batch training
+* TensorBoard logging
+
+The best model checkpoint is saved to:
+
+```
+checkpoints/best_model.pth
+```
+
+---
+
+# Evaluation
+
+Video-level evaluation aggregates predictions from multiple frames.
+
+Run evaluation with:
+
+```
+python -m src.evaluation.video_predict
+```
+
+Evaluation pipeline:
+
+1. Group frames by video
+2. Predict fake probability per frame
+3. Aggregate probabilities
+4. Produce final video prediction
+
+---
+
+# Results
+
+Quick training (3 epochs):
+
+Frame-level validation performance:
+
+Accuracy: 0.568
+F1 Score: 0.576
+AUC: 0.606
+
+Video-level evaluation (1000 sampled videos):
+
+Accuracy: 0.448
+
+**Note**: These baseline results are from early training stages. Higher accuracy is expected after 15+ epochs with backbone unfreezing.
+
+---
+
+# Requirements
+
+Install dependencies:
+
+```
+pip install -r requirements.txt
+```
+
+Main dependencies:
+
+* PyTorch
+* Torchvision
+* NumPy
+* Pillow
+* scikit-learn
+* tqdm
+* facenet-pytorch
+* TensorBoard
+
+
+---
+
+# Future Improvements
+
+Possible improvements include:
+
+* Fine-tuning the EfficientNet backbone
+* Temporal modeling for video understanding
+* Face tracking across frames
+* Larger datasets
+* Transformer-based architectures

@@ -209,8 +209,11 @@ __marimo__/
 # MacOS specific
 .DS_Store
 
-# Data and Models (Do not upload large files)
+# Data and Models
 data/
 models/*.pth
 models/*.h5
 *.mp4
+checkpoints/
+*.pyc
+runs/
