@@ -67,8 +67,15 @@ DeepFake-Detection
 ---
 
 # Dataset
+The dataset for this project is a curated subset of the FaceForensics++ (FF++) benchmark, a premier large-scale video dataset for facial manipulation detection.
 
-The dataset consists of **face crops extracted from real and fake videos**.
+To ensure a balanced and robust training process, we selected 2,000 videos in total, maintaining a strict 1:1 ratio between authentic and manipulated content.
+
+Total Videos: 2,000 (1,000 Real / 1,000 Fake).
+
+Techniques: Includes all 5 FF++ manipulation methods (Deepfakes, Face2Face, FaceSwap, NeuralTextures, and FaceShifter).
+
+Data Format: The model is trained on face crops extracted from video frames to focus specifically on facial artifacts and textures.
 
 Images are organized as:
 
